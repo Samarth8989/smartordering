@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Bundle Ordering - Kirana Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: white;
+        }
+        
+        .header {
+            background: #d35400;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .screen {
+            display: none;
+            padding: 20px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .category-card {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .category-card.selected {
+            border-color: #d35400;
+            background: #fff5f0;
+        }
+        
+        .category-card .emoji {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .category-card .name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .budget-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .budget-card {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .budget-card:hover {
+            transform: translateX(5px);
+            border-color: #d35400;
+        }
+        
+        .budget-card .amount {
+            font-size: 20px;
+            font-weight: bold;
+            color: #d35400;
+        }
+        
+        .budget-card .info {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .bundle-container {
+            margin: 20px 0;
+        }
+        
+        .bundle-card {
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .bundle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .bundle-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .bundle-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d35400;
+        }
+        
+        .bundle-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        .stat-icon {
+            font-size: 16px;
+        }
+        
+        .stat-label {
+            color: #666;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #27ae60;
+        }
+        
+        .why-buy {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .why-buy-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .why-buy-text {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .products-list {
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        
+        .product-name {
+            color: #333;
+        }
+        
+        .product-qty {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #d35400;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #c04000;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #d35400;
+            border: 2px solid #d35400;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #fff5f0;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+        }
+        
+        .step {
+            width: 40px;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            background: #d35400;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .section-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .success-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .success-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .success-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .order-summary {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .summary-row.total {
+            font-weight: bold;
+            font-size: 18px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        
+        /* Edit Bundle Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .modal-subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .edit-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .edit-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-info {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .item-price {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .qty-btn:hover:not(:disabled) {
+            background: #f5f5f5;
+            border-color: #d35400;
+        }
+        
+        .qty-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .qty-value {
+            font-size: 16px;
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            background: #f8f9fa;
+        }
+        
+        .total-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .total-label {
+            font-weight: 600;
+        }
+        
+        .total-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d35400;
+        }
+        
+        .margin-info {
+            font-size: 14px;
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Build Your Profitable Order</h1>
+            <p>Based on what 2,847 stores are successfully selling</p>
+        </div>
+        
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step active" id="step1"></div>
+            <div class="step" id="step2"></div>
+            <div class="step" id="step3"></div>
+        </div>
+        
+        <!-- Screen 1: Category Selection -->
+        <div class="screen active" id="screen1">
+            <h2 class="section-title">What products do you need today?</h2>
+            <p class="section-subtitle">Select all categories you want to order</p>
+            
+            <div class="category-grid">
+                <div class="category-card" data-category="daily">
+                    <div class="emoji">🥘</div>
+                    <div class="name">Daily Essentials</div>
+                </div>
+                <div class="category-card" data-category="snacks">
+                    <div class="emoji">🍪</div>
+                    <div class="name">Snacks & Namkeen</div>
+                </div>
+                <div class="category-card" data-category="spices">
+                    <div class="emoji">🧂</div>
+                    <div class="name">Spices & Masala</div>
+                </div>
+                <div class="category-card" data-category="personal">
+                    <div class="emoji">🧴</div>
+                    <div class="name">Personal Care</div>
+                </div>
+            </div>
+            
+            <button class="btn-primary" id="continueToStep2" disabled>Continue</button>
+        </div>
+        
+        <!-- Screen 2: Budget Selection -->
+        <div class="screen" id="screen2">
+            <h2 class="section-title">What's your ordering budget?</h2>
+            <p class="section-subtitle">We'll show bundles that fit your budget</p>
+            
+            <div class="budget-options">
+                <div class="budget-card" data-budget="600-1500">
+                    <div>
+                        <div class="amount">₹600 - ₹1,500</div>
+                        <div class="info">Starter Pack</div>
+                    </div>
+                    <div>→</div>
+                </div>
+                <div class="budget-card" data-budget="1500-2500">
+                    <div>
+                        <div class="amount">₹1,500 - ₹2,500</div>
+                        <div class="info">Regular Stock</div>
+                    </div>
+                    <div>→</div>
+                </div>
+                <div class="budget-card" data-budget="2500-5000">
+                    <div>
+                        <div class="amount">₹2,500 - ₹5,000</div>
+                        <div class="info">Bulk Order</div>
+                    </div>
+                    <div>→</div>
+                </div>
+                <div class="budget-card" data-budget="5000-10000">
+                    <div>
+                        <div class="amount">₹5,000 - ₹10,000</div>
+                        <div class="info">Wholesale Pack</div>
+                    </div>
+                    <div>→</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Screen 3: Bundle Recommendations -->
+        <div class="screen" id="screen3">
+            <h2 class="section-title">Recommended Bundles</h2>
+            <p class="section-subtitle">Based on your selection</p>
+            
+            <div class="bundle-container" id="bundleContainer">
+                <!-- Bundles will be dynamically inserted here -->
+            </div>
+        </div>
+        
+        <!-- Screen 4: Success -->
+        <div class="screen" id="screen4">
+            <div class="success-screen">
+                <div class="success-icon">✅</div>
+                <h2 class="success-title">Order Placed Successfully!</h2>
+                <p class="success-message">Your smart bundle has been added to cart</p>
+                
+                <div class="order-summary">
+                    <div class="summary-row">
+                        <span>Products</span>
+                        <span id="totalProducts">--</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Total Amount</span>
+                        <span id="totalAmount">--</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Average Margin</span>
+                        <span id="avgMargin" style="color: #27ae60;">--</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Expected Monthly Profit</span>
+                        <span id="monthlyProfit" style="color: #27ae60;">--</span>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" onclick="resetFlow()">Place Another Order</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Bundle Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Customize Bundle</div>
+                <div class="modal-subtitle">Adjust quantities to match your needs</div>
+            </div>
+            <div class="modal-body" id="editModalBody">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <div class="total-info">
+                    <span class="total-label">Total:</span>
+                    <span class="total-amount" id="editTotal">₹0</span>
+                </div>
+                <div class="margin-info" id="editMargin">Margin: 0%</div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-secondary" style="flex: 1;" onclick="closeEditModal()">Cancel</button>
+                    <button class="btn-primary" style="flex: 1;" onclick="applyBundleChanges()">Apply Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // State management
+        let selectedCategories = [];
+        let selectedBudget = '';
+        let currentEditBundle = null;
+        let editedQuantities = {};
+        
+        // Product prices (for calculation)
+        const productPrices = {
+            'Soya Chunks (200g)': 68,
+            'Soya Chunks (500g)': 150,
+            'Toor Dal (500g)': 85,
+            'Chana Dal (500g)': 75,
+            'Rice (1kg)': 45,
+            'Rice Premium (5kg)': 220,
+            'Atta (5kg)': 180,
+            'Atta (10kg)': 350,
+            'Multigrain Atta': 220,
+            'Organic Soya Chunks': 95,
+            'Premium Basmati Rice': 120,
+            'Organic Toor Dal': 110,
+            'Cooking Oil (1L)': 140,
+            'All Dals Pack': 90,
+            'Rice Variety Pack': 180,
+            'Dal Variety (1kg each)': 95,
+            'Oil & Ghee Combo': 250,
+            'Complete Dal Range': 85,
+            'Rice All Varieties': 150,
+            'Atta & Grain Mix': 200,
+            'Oil Variety Pack': 180,
+            'Spices & Masala Set': 120,
+            'Aloo Bhujia (200g)': 35,
+            'Mixture (200g)': 40,
+            'Chips (50g)': 20,
+            'Kurkure (50g)': 20,
+            'Namkeen Variety': 45,
+            'Chips & Wafers': 25,
+            'Biscuits Assorted': 30,
+            'Chocolates Mix': 50,
+            'Assorted Daily Items': 60,
+            'Mixed Snacks': 40,
+            'Variety Pack': 70
+        };
+        
+        // Bundle data
+        const bundles = {
+            '600-1500': {
+                daily: [
+                    {
+                        title: 'Daily Bestsellers Pack',
+                        price: 1050,
+                        margin: 28.5,
+                        stores: 2847,
+                        repeat: 82,
+                        why: 'These 5 products are ordered by 9 out of 10 stores every week. Fast moving with zero dead stock risk.',
+                        products: [
+                            { name: 'Soya Chunks (200g)', qty: 10 },
+                            { name: 'Toor Dal (500g)', qty: 5 },
+                            { name: 'Chana Dal (500g)', qty: 5 },
+                            { name: 'Rice (1kg)', qty: 3 },
+                            { name: 'Atta (5kg)', qty: 2 }
+                        ]
+                    },
+                    {
+                        title: 'High Margin Essentials',
+                        price: 1200,
+                        margin: 35.2,
+                        stores: 1923,
+                        repeat: 76,
+                        why: 'Premium products with 35%+ margins. Customers willing to pay more for quality.',
+                        products: [
+                            { name: 'Organic Soya Chunks', qty: 8 },
+                            { name: 'Premium Basmati Rice', qty: 4 },
+                            { name: 'Multigrain Atta', qty: 3 },
+                            { name: 'Organic Toor Dal', qty: 4 }
+                        ]
+                    }
+                ],
+                snacks: [
+                    {
+                        title: 'Top Snacks Combo',
+                        price: 980,
+                        margin: 32.1,
+                        stores: 3102,
+                        repeat: 88,
+                        why: 'Evening snacks that sell 3x faster during 4-8 PM. Perfect for impulse buyers.',
+                        products: [
+                            { name: 'Aloo Bhujia (200g)', qty: 10 },
+                            { name: 'Mixture (200g)', qty: 8 },
+                            { name: 'Chips (50g)', qty: 15 },
+                            { name: 'Kurkure (50g)', qty: 12 }
+                        ]
+                    }
+                ]
+            },
+            '1500-2500': {
+                daily: [
+                    {
+                        title: 'Complete Daily Stock',
+                        price: 2100,
+                        margin: 29.8,
+                        stores: 3421,
+                        repeat: 85,
+                        why: '2-week supply of fastest moving items. Covers 80% of daily customer needs.',
+                        products: [
+                            { name: 'Soya Chunks (200g)', qty: 20 },
+                            { name: 'All Dals Pack', qty: 15 },
+                            { name: 'Rice Variety Pack', qty: 10 },
+                            { name: 'Atta (5kg)', qty: 5 },
+                            { name: 'Cooking Oil (1L)', qty: 8 }
+                        ]
+                    }
+                ],
+                snacks: [
+                    {
+                        title: 'Snacks Mega Pack',
+                        price: 1850,
+                        margin: 33.5,
+                        stores: 2654,
+                        repeat: 90,
+                        why: 'Complete snacks section setup. Mix of local favorites and branded items for all age groups.',
+                        products: [
+                            { name: 'Namkeen Variety', qty: 25 },
+                            { name: 'Chips & Wafers', qty: 30 },
+                            { name: 'Biscuits Assorted', qty: 20 },
+                            { name: 'Chocolates Mix', qty: 15 }
+                        ]
+                    }
+                ]
+            },
+            '2500-5000': {
+                daily: [
+                    {
+                        title: 'Monthly Essentials Bundle',
+                        price: 3500,
+                        margin: 31.2,
+                        stores: 2103,
+                        repeat: 78,
+                        why: '30-day inventory of core products. Bulk buying saves 12% vs weekly orders.',
+                        products: [
+                            { name: 'Soya Chunks (500g)', qty: 20 },
+                            { name: 'Dal Variety (1kg each)', qty: 20 },
+                            { name: 'Rice Premium (5kg)', qty: 10 },
+                            { name: 'Atta (10kg)', qty: 8 },
+                            { name: 'Oil & Ghee Combo', qty: 15 }
+                        ]
+                    }
+                ]
+            },
+            '5000-10000': {
+                daily: [
+                    {
+                        title: 'Wholesale Profit Pack',
+                        price: 7500,
+                        margin: 34.5,
+                        stores: 892,
+                        repeat: 72,
+                        why: 'Bulk quantities at wholesale rates. 34%+ margins with 45-day inventory coverage.',
+                        products: [
+                            { name: 'Complete Dal Range', qty: 50 },
+                            { name: 'Rice All Varieties', qty: 40 },
+                            { name: 'Atta & Grain Mix', qty: 30 },
+                            { name: 'Oil Variety Pack', qty: 25 },
+                            { name: 'Spices & Masala Set', qty: 40 }
+                        ]
+                    }
+                ]
+            }
+        };
+        
+        // Event listeners
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                const category = this.dataset.category;
+                
+                if (this.classList.contains('selected')) {
+                    selectedCategories.push(category);
+                } else {
+                    selectedCategories = selectedCategories.filter(c => c !== category);
+                }
+                
+                document.getElementById('continueToStep2').disabled = selectedCategories.length === 0;
+            });
+        });
+        
+        document.getElementById('continueToStep2').addEventListener('click', function() {
+            showScreen(2);
+        });
+        
+        document.querySelectorAll('.budget-card').forEach(card => {
+            card.addEventListener('click', function() {
+                selectedBudget = this.dataset.budget;
+                showScreen(3);
+                displayBundles();
+            });
+        });
+        
+        function showScreen(screenNumber) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show selected screen
+            document.getElementById(`screen${screenNumber}`).classList.add('active');
+            
+            // Update step indicator
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index < screenNumber) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+        
+        function displayBundles() {
+            const container = document.getElementById('bundleContainer');
+            container.innerHTML = '';
+            
+            const budgetBundles = bundles[selectedBudget];
+            let bundlesToShow = [];
+            
+            // Get bundles for selected categories
+            selectedCategories.forEach(category => {
+                if (budgetBundles[category]) {
+                    bundlesToShow = bundlesToShow.concat(budgetBundles[category]);
+                }
+            });
+            
+            // If no specific bundles, show a default
+            if (bundlesToShow.length === 0) {
+                bundlesToShow = [{
+                    title: 'Mixed Category Bundle',
+                    price: parseInt(selectedBudget.split('-')[0]) + 200,
+                    margin: 30.5,
+                    stores: 2100,
+                    repeat: 80,
+                    why: 'Balanced mix across your selected categories. Great for testing new products.',
+                    products: [
+                        { name: 'Assorted Daily Items', qty: 15 },
+                        { name: 'Mixed Snacks', qty: 10 },
+                        { name: 'Variety Pack', qty: 8 }
+                    ]
+                }];
+            }
+            
+            // Create bundle cards
+            bundlesToShow.forEach(bundle => {
+                const bundleCard = createBundleCard(bundle);
+                container.appendChild(bundleCard);
+            });
+        }
+        
+        function createBundleCard(bundle) {
+            const card = document.createElement('div');
+            card.className = 'bundle-card';
+            
+            card.innerHTML = `
+                <div class="bundle-header">
+                    <div class="bundle-title">${bundle.title}</div>
+                    <div class="bundle-price">₹${bundle.price}</div>
+                </div>
+                
+                <div class="bundle-stats">
+                    <div class="stat">
+                        <span class="stat-icon">💰</span>
+                        <span class="stat-label">Margin:</span>
+                        <span class="stat-value">${bundle.margin}%</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-icon">🏪</span>
+                        <span class="stat-label">Stores:</span>
+                        <span class="stat-value">${bundle.stores}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-icon">🔄</span>
+                        <span class="stat-label">Repeat:</span>
+                        <span class="stat-value">${bundle.repeat}%</span>
+                    </div>
+                </div>
+                
+                <div class="why-buy">
+                    <div class="why-buy-title">Why this bundle?</div>
+                    <div class="why-buy-text">${bundle.why}</div>
+                </div>
+                
+                <div class="products-list">
+                    ${bundle.products.map((product, index) => `
+                        <div class="product-item">
+                            <span class="product-name">${product.name}</span>
+                            <span class="product-qty">×${product.qty}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="btn-primary" style="flex: 1;" onclick="selectBundle(${JSON.stringify(bundle).replace(/"/g, '&quot;')})">
+                        Select This Bundle
+                    </button>
+                    <button class="btn-secondary" style="flex: 0.5;" onclick="editBundle(${JSON.stringify(bundle).replace(/"/g, '&quot;')})">
+                        Edit
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        function selectBundle(bundle) {
+            // Calculate summary
+            const totalProducts = bundle.products.reduce((sum, p) => sum + p.qty, 0);
+            const monthlyProfit = Math.round(bundle.price * bundle.margin / 100 * 4); // Assuming weekly turnover
+            
+            // Update success screen
+            document.getElementById('totalProducts').textContent = totalProducts + ' items';
+            document.getElementById('totalAmount').textContent = '₹' + bundle.price;
+            document.getElementById('avgMargin').textContent = bundle.margin + '%';
+            document.getElementById('monthlyProfit').textContent = '₹' + monthlyProfit;
+            
+            // Show success screen
+            showScreen(4);
+        }
+        
+        function resetFlow() {
+            selectedCategories = [];
+            selectedBudget = '';
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('continueToStep2').disabled = true;
+            showScreen(1);
+        }
+        
+        // Edit Bundle Functions
+        function editBundle(bundle) {
+            currentEditBundle = JSON.parse(JSON.stringify(bundle)); // Deep clone
+            editedQuantities = {};
+            
+            // Initialize quantities
+            bundle.products.forEach((product, index) => {
+                editedQuantities[index] = product.qty;
+            });
+            
+            // Show modal
+            document.getElementById('editModal').classList.add('active');
+            renderEditModal();
+        }
+        
+        function renderEditModal() {
+            const modalBody = document.getElementById('editModalBody');
+            modalBody.innerHTML = '';
+            
+            currentEditBundle.products.forEach((product, index) => {
+                const price = productPrices[product.name] || 50;
+                const editItem = document.createElement('div');
+                editItem.className = 'edit-item';
+                editItem.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-name">${product.name}</div>
+                        <div class="item-price">₹${price} per unit</div>
+                    </div>
+                    <div class="quantity-control">
+                        <button class="qty-btn" onclick="updateQuantity(${index}, -1)">−</button>
+                        <span class="qty-value">${editedQuantities[index]}</span>
+                        <button class="qty-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                    </div>
+                `;
+                modalBody.appendChild(editItem);
+            });
+            
+            updateEditTotal();
+        }
+        
+        function updateQuantity(index, change) {
+            const newQty = editedQuantities[index] + change;
+            if (newQty >= 0 && newQty <= 99) {
+                editedQuantities[index] = newQty;
+                renderEditModal();
+            }
+        }
+        
+        function updateEditTotal() {
+            let total = 0;
+            currentEditBundle.products.forEach((product, index) => {
+                const price = productPrices[product.name] || 50;
+                total += price * editedQuantities[index];
+            });
+            
+            document.getElementById('editTotal').textContent = '₹' + total;
+            document.getElementById('editMargin').textContent = 
+                `Margin: ${currentEditBundle.margin}% (₹${Math.round(total * currentEditBundle.margin / 100)} profit)`;
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            currentEditBundle = null;
+            editedQuantities = {};
+        }
+        
+        function applyBundleChanges() {
+            // Update bundle with new quantities
+            currentEditBundle.products.forEach((product, index) => {
+                product.qty = editedQuantities[index];
+            });
+            
+            // Recalculate price
+            let total = 0;
+            currentEditBundle.products.forEach((product, index) => {
+                const price = productPrices[product.name] || 50;
+                total += price * product.qty;
+            });
+            currentEditBundle.price = total;
+            
+            // Close modal and select the edited bundle
+            closeEditModal();
+            selectBundle(currentEditBundle);
+        }
+        
+        // Close modal on overlay click
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
+    </script>
+</body>
+</html>
