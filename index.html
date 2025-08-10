@@ -11,6 +11,12 @@
             box-sizing: border-box;
         }
         
+        @media (max-width: 480px) {
+            .slot-options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background-color: #f5f5f5;
@@ -29,6 +35,7 @@
             color: white;
             padding: 20px;
             text-align: center;
+            position: relative;
         }
         
         .header h1 {
@@ -39,6 +46,24 @@
         .header p {
             font-size: 14px;
             opacity: 0.9;
+        }
+        
+        .back-button {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            display: none;
+        }
+        
+        .back-button.visible {
+            display: block;
         }
         
         .screen {
@@ -144,6 +169,7 @@
             margin-bottom: 20px;
             background: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
         
         .bundle-header {
@@ -175,19 +201,23 @@
             align-items: center;
             gap: 5px;
             font-size: 14px;
+            min-width: 0;
         }
         
         .stat-icon {
             font-size: 16px;
+            flex-shrink: 0;
         }
         
         .stat-label {
             color: #666;
+            flex-shrink: 0;
         }
         
         .stat-value {
             font-weight: bold;
             color: #27ae60;
+            white-space: nowrap;
         }
         
         .why-buy {
@@ -220,15 +250,21 @@
             align-items: center;
             padding: 8px 0;
             font-size: 14px;
+            gap: 10px;
         }
         
         .product-name {
             color: #333;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
         .product-qty {
             color: #666;
             font-weight: 500;
+            flex-shrink: 0;
         }
         
         .btn-primary {
@@ -247,6 +283,12 @@
         .btn-primary:hover {
             background: #c04000;
             transform: translateY(-1px);
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
         
         .btn-secondary {
@@ -484,12 +526,215 @@
             from { opacity: 0; }
             to { opacity: 1; }
         }
+        
+        /* Address Form Styles */
+        .address-form {
+            max-width: 100%;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #d35400;
+            box-shadow: 0 0 0 3px rgba(211, 84, 0, 0.1);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-group.half {
+            flex: 1;
+        }
+        
+        .delivery-slot {
+            margin: 30px 0;
+        }
+        
+        .delivery-slot h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .slot-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .slot-option input[type="radio"] {
+            display: none;
+        }
+        
+        .slot-card {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .slot-option input[type="radio"]:checked + .slot-card {
+            border-color: #d35400;
+            background: #fff5f0;
+        }
+        
+        .slot-time {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .slot-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .order-confirmation {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .confirmation-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .confirmation-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .conf-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .conf-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0 30px;
+        }
+        
+        .payment-option input[type="radio"] {
+            display: none;
+        }
+        
+        .payment-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-option input[type="radio"]:checked + .payment-card {
+            border-color: #d35400;
+            background: #fff5f0;
+        }
+        
+        .payment-icon {
+            font-size: 32px;
+        }
+        
+        .payment-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .payment-desc {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .order-total-box {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .total-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d35400;
+        }
+
+        .success-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2000;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .success-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Header -->
         <div class="header">
+            <button class="back-button" id="backButton" onclick="goBack()">←</button>
             <h1>Build Your Profitable Order</h1>
             <p>Based on what 2,847 stores are successfully selling</p>
         </div>
@@ -507,25 +752,25 @@
             <p class="section-subtitle">Select all categories you want to order</p>
             
             <div class="category-grid">
-                <div class="category-card" data-category="daily">
+                <div class="category-card" data-category="daily" onclick="selectCategory(this, 'daily')">
                     <div class="emoji">🥘</div>
                     <div class="name">Daily Essentials</div>
                 </div>
-                <div class="category-card" data-category="snacks">
+                <div class="category-card" data-category="snacks" onclick="selectCategory(this, 'snacks')">
                     <div class="emoji">🍪</div>
                     <div class="name">Snacks & Namkeen</div>
                 </div>
-                <div class="category-card" data-category="spices">
+                <div class="category-card" data-category="spices" onclick="selectCategory(this, 'spices')">
                     <div class="emoji">🧂</div>
                     <div class="name">Spices & Masala</div>
                 </div>
-                <div class="category-card" data-category="personal">
+                <div class="category-card" data-category="personal" onclick="selectCategory(this, 'personal')">
                     <div class="emoji">🧴</div>
                     <div class="name">Personal Care</div>
                 </div>
             </div>
             
-            <button class="btn-primary" id="continueToStep2" disabled>Continue</button>
+            <button class="btn-primary" id="continueToStep2" onclick="showScreen(2)" disabled>Continue</button>
         </div>
         
         <!-- Screen 2: Budget Selection -->
@@ -534,28 +779,28 @@
             <p class="section-subtitle">We'll show bundles that fit your budget</p>
             
             <div class="budget-options">
-                <div class="budget-card" data-budget="600-1500">
+                <div class="budget-card" data-budget="600-1500" onclick="selectBudget(this, '600-1500')">
                     <div>
                         <div class="amount">₹600 - ₹1,500</div>
                         <div class="info">Starter Pack</div>
                     </div>
                     <div>→</div>
                 </div>
-                <div class="budget-card" data-budget="1500-2500">
+                <div class="budget-card" data-budget="1500-2500" onclick="selectBudget(this, '1500-2500')">
                     <div>
                         <div class="amount">₹1,500 - ₹2,500</div>
                         <div class="info">Regular Stock</div>
                     </div>
                     <div>→</div>
                 </div>
-                <div class="budget-card" data-budget="2500-5000">
+                <div class="budget-card" data-budget="2500-5000" onclick="selectBudget(this, '2500-5000')">
                     <div>
                         <div class="amount">₹2,500 - ₹5,000</div>
                         <div class="info">Bulk Order</div>
                     </div>
                     <div>→</div>
                 </div>
-                <div class="budget-card" data-budget="5000-10000">
+                <div class="budget-card" data-budget="5000-10000" onclick="selectBudget(this, '5000-10000')">
                     <div>
                         <div class="amount">₹5,000 - ₹10,000</div>
                         <div class="info">Wholesale Pack</div>
@@ -575,12 +820,12 @@
             </div>
         </div>
         
-        <!-- Screen 4: Success -->
+        <!-- Screen 4: Cart Confirmation -->
         <div class="screen" id="screen4">
             <div class="success-screen">
-                <div class="success-icon">✅</div>
-                <h2 class="success-title">Order Placed Successfully!</h2>
-                <p class="success-message">Your smart bundle has been added to cart</p>
+                <div class="success-icon">🛒</div>
+                <h2 class="success-title">Bundle Added to Cart!</h2>
+                <p class="success-message">Great choice! Your smart bundle is ready</p>
                 
                 <div class="order-summary">
                     <div class="summary-row">
@@ -596,12 +841,165 @@
                         <span id="avgMargin" style="color: #27ae60;">--</span>
                     </div>
                     <div class="summary-row total">
-                        <span>Expected Monthly Profit</span>
+                        <span>Your Profit on this Order</span>
                         <span id="monthlyProfit" style="color: #27ae60;">--</span>
                     </div>
                 </div>
                 
-                <button class="btn-primary" onclick="resetFlow()">Place Another Order</button>
+                <button class="btn-primary" onclick="showScreen(5)">Place Order</button>
+                <button class="btn-secondary" style="margin-top: 10px;" onclick="resetFlow()">Add More Products</button>
+            </div>
+        </div>
+        
+        <!-- Screen 5: Payment Method Selection -->
+        <div class="screen" id="screen5">
+            <h2 class="section-title">How would you like to pay?</h2>
+            <p class="section-subtitle">Choose your preferred payment method</p>
+            
+            <div class="payment-options">
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="cod" checked>
+                    <div class="payment-card">
+                        <div class="payment-icon">💵</div>
+                        <div class="payment-info">
+                            <div class="payment-title">Cash on Delivery</div>
+                            <div class="payment-desc">Pay when you receive your order</div>
+                        </div>
+                    </div>
+                </label>
+                
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="online">
+                    <div class="payment-card">
+                        <div class="payment-icon">💳</div>
+                        <div class="payment-info">
+                            <div class="payment-title">Pay Online Now</div>
+                            <div class="payment-desc">UPI, Cards, Net Banking</div>
+                        </div>
+                    </div>
+                </label>
+                
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="credit">
+                    <div class="payment-card">
+                        <div class="payment-icon">📊</div>
+                        <div class="payment-info">
+                            <div class="payment-title">Credit (7 days)</div>
+                            <div class="payment-desc">Pay within 7 days of delivery</div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="order-total-box">
+                <div class="total-row">
+                    <span>Order Total</span>
+                    <span class="total-value" id="paymentTotal">--</span>
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="showScreen(6)">Continue</button>
+        </div>
+        
+        <!-- Screen 6: Address Collection -->
+        <div class="screen" id="screen6">
+            <h2 class="section-title">Delivery Details</h2>
+            <p class="section-subtitle">Where should we deliver your order?</p>
+            
+            <div class="address-form">
+                <div class="form-group">
+                    <label>Store Name*</label>
+                    <input type="text" id="storeName" placeholder="Enter your store name" />
+                </div>
+                
+                <div class="form-group">
+                    <label>Mobile Number*</label>
+                    <input type="tel" id="phoneNumber" placeholder="10-digit mobile number" maxlength="10" />
+                </div>
+                
+                <div class="form-group">
+                    <label>Delivery Address*</label>
+                    <textarea id="address" rows="3" placeholder="Shop no, Building, Street name"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label>Area/Locality*</label>
+                        <input type="text" id="area" placeholder="e.g. Koramangala" />
+                    </div>
+                    <div class="form-group half">
+                        <label>Pincode*</label>
+                        <input type="text" id="pincode" placeholder="6 digits" maxlength="6" />
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Landmark (Optional)</label>
+                    <input type="text" id="landmark" placeholder="Near..." />
+                </div>
+                
+                <div class="delivery-slot">
+                    <h3>Preferred Delivery Time</h3>
+                    <div class="slot-options">
+                        <label class="slot-option">
+                            <input type="radio" name="slot" value="morning" checked>
+                            <span class="slot-card">
+                                <span class="slot-time">9 AM - 12 PM</span>
+                                <span class="slot-label">Morning</span>
+                            </span>
+                        </label>
+                        <label class="slot-option">
+                            <input type="radio" name="slot" value="afternoon">
+                            <span class="slot-card">
+                                <span class="slot-time">12 PM - 4 PM</span>
+                                <span class="slot-label">Afternoon</span>
+                            </span>
+                        </label>
+                        <label class="slot-option">
+                            <input type="radio" name="slot" value="evening">
+                            <span class="slot-card">
+                                <span class="slot-time">4 PM - 8 PM</span>
+                                <span class="slot-label">Evening</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" onclick="completeOrder()">Complete Order</button>
+            </div>
+        </div>
+        
+        <!-- Screen 7: Final Success -->
+        <div class="screen" id="screen7">
+            <div class="success-screen">
+                <div class="success-icon">✅</div>
+                <h2 class="success-title">Order Placed Successfully!</h2>
+                <p class="success-message">Your order will be delivered tomorrow</p>
+                
+                <div class="order-confirmation">
+                    <div class="confirmation-item">
+                        <span class="conf-label">Order ID</span>
+                        <span class="conf-value">#<span id="orderId2">2024001</span></span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="conf-label">Delivery Address</span>
+                        <span class="conf-value" id="deliveryAddress2">--</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="conf-label">Delivery Slot</span>
+                        <span class="conf-value" id="deliverySlot2">--</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="conf-label">Payment Method</span>
+                        <span class="conf-value" id="paymentMethod">--</span>
+                    </div>
+                    <div class="confirmation-item">
+                        <span class="conf-label">Total Amount</span>
+                        <span class="conf-value" id="finalAmount2">--</span>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" onclick="location.reload()">Start New Order</button>
             </div>
         </div>
     </div>
@@ -630,12 +1028,21 @@
         </div>
     </div>
     
+    <!-- Success Toast -->
+    <div class="success-toast" id="successToast">
+        <span>✓</span>
+        <span id="toastMessage">Bundle added successfully!</span>
+    </div>
+
     <script>
         // State management
         let selectedCategories = [];
         let selectedBudget = '';
         let currentEditBundle = null;
         let editedQuantities = {};
+        let orderData = {};
+        let currentScreen = 1;
+        let screenHistory = [];
         
         // Product prices (for calculation)
         const productPrices = {
@@ -680,7 +1087,7 @@
                 daily: [
                     {
                         title: 'Daily Bestsellers Pack',
-                        price: 1050,
+                        price: 1250,
                         margin: 28.5,
                         stores: 2847,
                         repeat: 82,
@@ -695,7 +1102,7 @@
                     },
                     {
                         title: 'High Margin Essentials',
-                        price: 1200,
+                        price: 1350,
                         margin: 35.2,
                         stores: 1923,
                         repeat: 76,
@@ -711,7 +1118,7 @@
                 snacks: [
                     {
                         title: 'Top Snacks Combo',
-                        price: 980,
+                        price: 1150,
                         margin: 32.1,
                         stores: 3102,
                         repeat: 88,
@@ -800,35 +1207,37 @@
             }
         };
         
-        // Event listeners
-        document.querySelectorAll('.category-card').forEach(card => {
-            card.addEventListener('click', function() {
-                this.classList.toggle('selected');
-                const category = this.dataset.category;
-                
-                if (this.classList.contains('selected')) {
+        // Category selection function
+        function selectCategory(element, category) {
+            element.classList.toggle('selected');
+            
+            if (element.classList.contains('selected')) {
+                if (!selectedCategories.includes(category)) {
                     selectedCategories.push(category);
-                } else {
-                    selectedCategories = selectedCategories.filter(c => c !== category);
                 }
-                
-                document.getElementById('continueToStep2').disabled = selectedCategories.length === 0;
-            });
-        });
+            } else {
+                selectedCategories = selectedCategories.filter(c => c !== category);
+            }
+            
+            // Enable/disable continue button
+            const continueBtn = document.getElementById('continueToStep2');
+            continueBtn.disabled = selectedCategories.length === 0;
+        }
         
-        document.getElementById('continueToStep2').addEventListener('click', function() {
-            showScreen(2);
-        });
-        
-        document.querySelectorAll('.budget-card').forEach(card => {
-            card.addEventListener('click', function() {
-                selectedBudget = this.dataset.budget;
-                showScreen(3);
-                displayBundles();
-            });
-        });
+        // Budget selection function
+        function selectBudget(element, budget) {
+            selectedBudget = budget;
+            showScreen(3);
+            displayBundles();
+        }
         
         function showScreen(screenNumber) {
+            // Save current screen to history
+            if (currentScreen !== screenNumber) {
+                screenHistory.push(currentScreen);
+            }
+            currentScreen = screenNumber;
+            
             // Hide all screens
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
@@ -839,12 +1248,33 @@
             
             // Update step indicator
             document.querySelectorAll('.step').forEach((step, index) => {
-                if (index < screenNumber) {
+                if (index < Math.min(screenNumber, 3)) {
                     step.classList.add('active');
                 } else {
                     step.classList.remove('active');
                 }
             });
+            
+            // Show/hide back button
+            const backButton = document.getElementById('backButton');
+            if (screenNumber > 1 && screenNumber < 7) {
+                backButton.classList.add('visible');
+            } else {
+                backButton.classList.remove('visible');
+            }
+            
+            // Update payment total when showing payment screen
+            if (screenNumber === 5 && orderData.totalAmount) {
+                document.getElementById('paymentTotal').textContent = '₹' + orderData.totalAmount;
+            }
+        }
+        
+        function goBack() {
+            if (screenHistory.length > 0) {
+                const previousScreen = screenHistory.pop();
+                currentScreen = previousScreen;
+                showScreen(previousScreen);
+            }
         }
         
         function displayBundles() {
@@ -889,10 +1319,13 @@
             const card = document.createElement('div');
             card.className = 'bundle-card';
             
+            // Use the predefined bundle price instead of calculating
+            const bundlePrice = bundle.price;
+            
             card.innerHTML = `
                 <div class="bundle-header">
                     <div class="bundle-title">${bundle.title}</div>
-                    <div class="bundle-price">₹${bundle.price}</div>
+                    <div class="bundle-price">₹${bundlePrice}</div>
                 </div>
                 
                 <div class="bundle-stats">
@@ -921,7 +1354,7 @@
                 <div class="products-list">
                     ${bundle.products.map((product, index) => `
                         <div class="product-item">
-                            <span class="product-name">${product.name}</span>
+                            <span class="product-name" title="${product.name}">${product.name}</span>
                             <span class="product-qty">×${product.qty}</span>
                         </div>
                     `).join('')}
@@ -941,23 +1374,99 @@
         }
         
         function selectBundle(bundle) {
-            // Calculate summary
-            const totalProducts = bundle.products.reduce((sum, p) => sum + p.qty, 0);
-            const monthlyProfit = Math.round(bundle.price * bundle.margin / 100 * 4); // Assuming weekly turnover
+            // Store order data for later use
+            orderData = {
+                bundle: bundle,
+                totalProducts: bundle.products.reduce((sum, p) => sum + p.qty, 0),
+                totalAmount: bundle.price,
+                avgMargin: bundle.margin,
+                monthlyProfit: Math.round(bundle.price * bundle.margin / 100)
+            };
             
             // Update success screen
-            document.getElementById('totalProducts').textContent = totalProducts + ' items';
-            document.getElementById('totalAmount').textContent = '₹' + bundle.price;
-            document.getElementById('avgMargin').textContent = bundle.margin + '%';
-            document.getElementById('monthlyProfit').textContent = '₹' + monthlyProfit;
+            document.getElementById('totalProducts').textContent = orderData.totalProducts + ' items';
+            document.getElementById('totalAmount').textContent = '₹' + orderData.totalAmount;
+            document.getElementById('avgMargin').textContent = orderData.avgMargin + '%';
+            document.getElementById('monthlyProfit').textContent = '₹' + orderData.monthlyProfit;
             
-            // Show success screen
-            showScreen(4);
+            // Show success toast
+            showToast('Bundle added to cart successfully!');
+            
+            // Show success screen (now acts as cart confirmation)
+            setTimeout(() => {
+                showScreen(4);
+            }, 500);
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('successToast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        function completeOrder() {
+            // Basic validation
+            const storeName = document.getElementById('storeName').value.trim();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const area = document.getElementById('area').value.trim();
+            const pincode = document.getElementById('pincode').value.trim();
+            
+            if (!storeName || !phoneNumber || !address || !area || !pincode) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            if (phoneNumber.length !== 10) {
+                alert('Please enter a valid 10-digit phone number');
+                return;
+            }
+            
+            if (pincode.length !== 6) {
+                alert('Please enter a valid 6-digit pincode');
+                return;
+            }
+            
+            // Get delivery slot
+            const selectedSlot = document.querySelector('input[name="slot"]:checked').value;
+            const slotMap = {
+                morning: '9 AM - 12 PM',
+                afternoon: '12 PM - 4 PM',
+                evening: '4 PM - 8 PM'
+            };
+            
+            // Get payment method
+            const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+            const paymentMap = {
+                cod: 'Cash on Delivery',
+                online: 'Online Payment',
+                credit: 'Credit (7 days)'
+            };
+            
+            // Generate order ID
+            const orderId = Math.floor(100000 + Math.random() * 900000);
+            
+            // Update final confirmation screen
+            document.getElementById('orderId2').textContent = orderId;
+            document.getElementById('deliveryAddress2').textContent = `${address}, ${area} - ${pincode}`;
+            document.getElementById('deliverySlot2').textContent = slotMap[selectedSlot];
+            document.getElementById('paymentMethod').textContent = paymentMap[selectedPayment];
+            document.getElementById('finalAmount2').textContent = '₹' + orderData.totalAmount;
+            
+            // Show final success screen
+            showScreen(7);
         }
         
         function resetFlow() {
             selectedCategories = [];
             selectedBudget = '';
+            currentScreen = 1;
+            screenHistory = [];
             document.querySelectorAll('.category-card').forEach(card => {
                 card.classList.remove('selected');
             });
